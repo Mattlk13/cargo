@@ -617,7 +617,7 @@ fn env_relative_path_included_from_same_level() {
     );
     assert_e2e().eq(
         env.get("OUTER").unwrap().to_str().unwrap(),
-        str!["[ROOT]/foo/.cargo/../../outer-val"],
+        str!["[ROOT]/outer-val"],
     );
 }
 
@@ -642,6 +642,6 @@ fn env_relative_path_included_from_upper_level() {
 
     assert_e2e().eq(
         env.get("MY_ENV").unwrap().to_str().unwrap(),
-        str!["[ROOT]/outer/foo/.cargo/../val"],
+        str!["[ROOT]/val"],
     );
 }
