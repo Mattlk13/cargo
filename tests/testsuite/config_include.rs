@@ -645,3 +645,64 @@ fn env_relative_path_included_from_upper_level() {
         str!["[ROOT]/val"],
     );
 }
+
+#[cargo_test]
+fn env_relative_path_included_override() {
+    // See https://github.com/rust-lang/cargo/issues/16954
+    write_config_at(
+        "foo/.cargo/config.toml",
+        "
+        include = ['../../inc/inc.toml']
+
+        [env]
+        MY_ENV = { value = 'inner', relative = true }
+        ",
+    );
+    write_config_at(
+        "inc/inc.toml",
+        "
+        [env]
+        MY_ENV = { value = 'outer', relative = true }
+        ",
+    );
+    let gctx = GlobalContextBuilder::new().cwd("foo").build();
+    let env = gctx.env_config().unwrap();
+    let my_env = env.get("MY_ENV").unwrap();
+
+    assert_e2e().eq(my_env.to_str().unwrap(), str!["[ROOT]/inner"]);
+}
+
+#[cargo_test]
+fn env_relative_path_nested_included_override() {
+    // See https://github.com/rust-lang/cargo/issues/16954
+    write_config_at(
+        "foo/.cargo/config.toml",
+        "
+        include = ['../../mid/mid.toml']
+
+        [env]
+        MY_ENV = { value = 'inner', relative = true }
+        ",
+    );
+    write_config_at(
+        "mid/mid.toml",
+        "
+        include = ['../deep/deep.toml']
+
+        [env]
+        MY_ENV = { value = 'mid', relative = true }
+        ",
+    );
+    write_config_at(
+        "deep/deep.toml",
+        "
+        [env]
+        MY_ENV = { value = 'deep', relative = true }
+        ",
+    );
+    let gctx = GlobalContextBuilder::new().cwd("foo").build();
+    let env = gctx.env_config().unwrap();
+    let my_env = env.get("MY_ENV").unwrap();
+
+    assert_e2e().eq(my_env.to_str().unwrap(), str!["[ROOT]/inner"]);
+}
