@@ -669,7 +669,7 @@ fn env_relative_path_included_override() {
     let env = gctx.env_config().unwrap();
     let my_env = env.get("MY_ENV").unwrap();
 
-    assert_e2e().eq(my_env.to_str().unwrap(), str!["[ROOT]/inner"]);
+    assert_e2e().eq(my_env.to_str().unwrap(), str!["[ROOT]/foo/inner"]);
 }
 
 #[cargo_test]
@@ -704,5 +704,5 @@ fn env_relative_path_nested_included_override() {
     let env = gctx.env_config().unwrap();
     let my_env = env.get("MY_ENV").unwrap();
 
-    assert_e2e().eq(my_env.to_str().unwrap(), str!["[ROOT]/inner"]);
+    assert_e2e().eq(my_env.to_str().unwrap(), str!["[ROOT]/foo/inner"]);
 }
